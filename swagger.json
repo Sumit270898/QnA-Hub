@@ -1,0 +1,291 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Question-Answer API",
+    "description": "API documentation for the Question-Answer assignment"
+  },
+  "host": "localhost:5000",
+  "basePath": "/api",
+  "schemes": ["http"],
+  "tags": [
+    { "name": "Users", "description": "APIs related to user management" },
+    { "name": "Categories", "description": "APIs related to categories" },
+    { "name": "Questions", "description": "APIs related to questions" },
+    { "name": "Answers", "description": "APIs related to answers" }
+  ],
+  "paths": {
+    "/users/signup": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "User Signup",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "email": { "type": "string" },
+                "password": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "User registered successfully" }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "User Login",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "string", "example": "sumitprl3@gmail.com"},
+                "password": { "type": "string", "example": "123456" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "User logged in successfully" }
+        }
+      }
+    },
+    "/users/profile": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "View User Profile",
+        "security": [{ "BearerAuth": [] }],
+        "responses": {
+          "200": { "description": "User profile retrieved successfully" }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "summary": "Edit User Profile",
+        "security": [{ "BearerAuth": [] }],
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "profilePicture",
+            "type": "file",
+            "required": false,
+            "description": "Profile picture to upload"
+          },
+          {
+            "in": "formData",
+            "name": "name",
+            "type": "string",
+            "required": false,
+            "description": "Updated name of the user"
+          },
+          {
+            "in": "formData",
+            "name": "email",
+            "type": "string",
+            "required": false,
+            "description": "Updated email of the user"
+          }
+        ],
+        "responses": {
+          "200": { "description": "User profile updated successfully" },
+          "400": { "description": "Invalid input" }
+        }
+      }
+    },
+    "/users/verify/{token}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Verify User Profile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "type": "string",
+            "description": "JWT token sent in the verification email"
+          }
+        ],
+        "responses": {
+          "200": { "description": "User verified successfully" },
+          "400": { "description": "Invalid or expired token" },
+          "404": { "description": "User not found" }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "tags": ["Categories"],
+        "summary": "Get All Categories",
+        "responses": {
+          "200": { "description": "List of all categories" }
+        }
+      },
+      "post": {
+        "tags": ["Categories"],
+        "summary": "Create a Single Category",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" }
+              },
+              "required": ["name"]
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Category created successfully" },
+          "400": { "description": "Invalid input" }
+        }
+      }
+    },
+    "/categories/with-question-count": {
+      "get": {
+        "tags": ["Categories"],
+        "summary": "Get Categories with Question Count",
+        "responses": {
+          "200": { "description": "List of categories with question counts" }
+        }
+      }
+    },
+    "/questions/bulk": {
+      "post": {
+        "tags": ["Questions"],
+        "summary": "Add Questions in Bulk",
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "file",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": { "description": "Questions added successfully" }
+        }
+      }
+    },
+    "/questions/category/{categoryId}": {
+      "get": {
+        "tags": ["Questions"],
+        "summary": "Get Questions by Category",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "categoryId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": { "description": "List of questions for the category" }
+        }
+      }
+    },
+    "/questions": {
+      "post": {
+        "tags": ["Questions"],
+        "summary": "Create a Single Question",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "text": { "type": "string" },
+                "options": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "correctAnswer": { "type": "string" },
+                "categories": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              },
+              "required": ["text", "options", "correctAnswer", "categories"]
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Question created successfully" },
+          "400": { "description": "Invalid input" }
+        }
+      }
+    },
+    "/answers/submit": {
+      "post": {
+        "tags": ["Answers"],
+        "summary": "Submit Answer",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "questionId": { "type": "string" },
+                "selectedOption": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Answer submitted successfully" }
+        }
+      }
+    },
+    "/answers/search": {
+      "post": {
+        "tags": ["Answers"],
+        "summary": "Search Questions with Answers",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "searchText": { "type": "string" },
+                "timezone": { "type": "string" }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Search results with answers" }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "BearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}
